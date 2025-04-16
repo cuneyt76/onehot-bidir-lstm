@@ -9,6 +9,9 @@ val_set   = keras.utils.text_dataset_from_directory("aclImdb/train", validation_
 test_set  = keras.utils.text_dataset_from_directory("aclImdb/test", shuffle=False)
 
 max_tokens, max_len = 25, 25
+# just to quickly ensure that code runs properly
+# 20_000 and 600 might be more sensible values but they will make training painfully slow   
+
 vectorizer = TextVectorization(max_tokens=max_tokens, output_sequence_length=max_len, output_mode="int")
 train_set_inputs = train_set.map(lambda x, y: x)
 vectorizer.adapt(train_set_inputs)
@@ -46,5 +49,9 @@ model.compile(loss="binary_crossentropy", optimizer="rmsprop", metrics=["accurac
 # fit (train) model
 callbacks = [keras.callbacks.ModelCheckpoint("onehot_bidir_lstm.keras", save_best_only=True)]
 model.fit(train_set_ints, validation_data=val_set_ints, epochs=2, callbacks=callbacks)
+# epochs=2 is just to quickly ensure that code runs properly
+# a value around 10 might be a better choice but since this example uses onehot vector sequences and does not utilize word embeddings
+# 10 epochs and / or large max_tokens and max_len values make training painfully slow   
+
 model = keras.models.load_model("onehot_bidir_lstm.keras", custom_objects={"OneHotLayer": OneHotLayer})
 print(f"Best model test acc: {model.evaluate(test_set_ints)[1]:.4f}")
